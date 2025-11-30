@@ -58,6 +58,36 @@
 
 ---
 
+## 🚀 Deployment on Render
+
+This project is configured for easy deployment on [Render](https://render.com).
+
+### Option 1: Blueprints (Recommended)
+1. Create a new **Blueprint Instance** on Render.
+2. Connect your GitHub repository.
+3. Render will automatically detect `render.yaml` and set up:
+   - A **PostgreSQL database**.
+   - A **Node.js web service**.
+4. You will need to manually add your `SUPABASE_URL` and `SUPABASE_KEY` in the Render dashboard environment variables after creation.
+
+### Option 2: Manual Setup
+1. Create a **PostgreSQL** database on Render.
+2. Create a **Web Service** on Render:
+   - **Build Command:** `npm install`
+   - **Start Command:** `node server.js`
+3. Add the following Environment Variables:
+   - `DATABASE_URL`: (Internal connection string from your Render DB)
+   - `SESSION_SECRET`: (Any random string)
+   - `SUPABASE_URL`: (Your Supabase URL)
+   - `SUPABASE_KEY`: (Your Supabase Key)
+   - `SUPABASE_BUCKET`: `doctor-photos`
+   - `NODE_ENV`: `production`
+
+### Database Setup
+After deployment, connect to your Render database (using the external connection string) and run the contents of `schema.sql` to create the tables.
+
+---
+
 ## ⚙️ Environment Variables (`.env`)
 
 | Variable | Description |

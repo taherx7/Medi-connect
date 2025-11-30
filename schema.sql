@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS doctors (
     description TEXT,
     phone VARCHAR(50),
     location VARCHAR(255),
+    specialty VARCHAR(255),
     cost DECIMAL(10, 2),
     photos_url TEXT, -- Could be a comma-separated string or JSON array
     working_hours_start TIME,
@@ -45,3 +46,15 @@ CREATE TABLE IF NOT EXISTS blocked_slots (
     end_time TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Session Table (for connect-pg-simple)
+CREATE TABLE IF NOT EXISTS session (
+  sid varchar NOT NULL COLLATE "default",
+  sess json NOT NULL,
+  expire timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+
+ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire);
