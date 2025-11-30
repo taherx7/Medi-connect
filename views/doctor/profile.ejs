@@ -1,0 +1,316 @@
+<%- include('../partials/header') %>
+
+    <div class="container" style="padding: 4rem 0;">
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid rgba(239, 68, 68, 0.2);">
+                ⚠️ <%= error %>
+            </div>
+        <% } %>
+        
+        <div class="dashboard-grid">
+            <div class="content">
+                <div class="profile-header">
+                    <div class="profile-img">
+                        <% if (doctor.photos_url) { %>
+                            <img src="<%= doctor.photos_url %>" alt="<%= doctor.name %>" style="width: 100%; height: 100%; object-fit: cover; border-radius: 1rem;">
+                        <% } else { %>
+                            <%= doctor.name.charAt(0) %>
+                        <% } %>
+                    </div>
+                    <div>
+                        <h1 style="margin-bottom: 0.5rem;"><%= doctor.name %></h1>
+                        <p style="color: var(--text-light); margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 0.5rem;"></i><%= doctor.location %></p>
+                        <p style="font-weight: 500; color: var(--primary);"><i class="fas fa-tag" style="margin-right: 0.5rem;"></i><%= doctor.cost %> DT / consultation</p>
+                    </div>
+                </div>
+
+                <section style="margin-bottom: 3rem;">
+                    <h3>About</h3>
+                    <p style="margin-top: 1rem; color: var(--text-light);"><%= doctor.description || 'No description provided.' %></p>
+                </section>
+            </div>
+
+            <aside class="sidebar" style="position: sticky; top: 100px;">
+                <h3>Book Appointment</h3>
+
+                <p style="margin: 0.5rem 0 1rem; color: var(--text-light); font-size: 0.9rem;">
+                    Select a date and time from the calendar below
+                </p>
+
+                <% if (typeof user !== 'undefined' && user && user.role === 'doctor' && user.id === doctor.id) { %>
+                    <div class="alert" style="background: #eff6ff; color: var(--primary); padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+                        You are viewing your own profile.
+                    </div>
+                <% } else { %>
+                    <!-- Calendar for Booking -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <button onclick="changeBookingMonth(-1)" class="btn btn-outline" type="button">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 id="booking-calendar-month" style="margin: 0;"></h3>
+                            <button onclick="changeBookingMonth(1)" class="btn btn-outline" type="button">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Calendar Grid -->
+                        <div id="booking-calendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <!-- Days of week -->
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Sun</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Mon</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Tue</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Wed</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Thu</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Fri</div>
+                            <div style="text-align: center; font-weight: 600; padding: 0.5rem; color: var(--text-light);">Sat</div>
+                        </div>
+                        
+                        <!-- Time Slots for Selected Date -->
+                        <div id="time-slots-container" style="display: none;">
+                            <p style="margin-bottom: 1rem; font-weight: 600;">
+                                Selected Date: <span id="selected-date-display"></span>
+                            </p>
+                            <div id="time-slots-grid" class="slots-grid"></div>
+                        </div>
+                    </div>
+                    
+                    <% if (typeof user === 'undefined' || !user) { %>
+                        <p style="margin-top: 1rem; font-size: 0.85rem; text-align: center;">
+                            <a href="/auth/login">Log in</a> to book an appointment.
+                        </p>
+                    <% } %>
+                <% } %>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" 
+         data-is-logged-in="<%= typeof user !== 'undefined' && user ? 'true' : 'false' %>"
+         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px;">
+            <h3 style="margin-bottom: 1rem;">Confirm Booking</h3>
+            <p style="margin-bottom: 1.5rem;">Time: <span id="modalTime"></span></p>
+            
+            <form action="/patient/book" method="POST">
+                <input type="hidden" name="doctor_id" value="<%= doctor.id %>">
+                <input type="hidden" name="time_slot" id="modalTimeSlot">
+                
+                <div class="form-group">
+                    <label style="margin-bottom: 0.5rem; display: block;">Payment Method</label>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="cash" checked onchange="togglePaymentFields()"> Cash
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="online" onchange="togglePaymentFields()"> Online
+                        </label>
+                    </div>
+                    
+                    <!-- Online Payment Fields -->
+                    <div id="online-payment-fields" style="display: none; border-top: 1px solid var(--border); padding-top: 1rem;">
+                        <div class="form-group">
+                            <label>Card Number *</label>
+                            <input type="text" id="card_number" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Expiry *</label>
+                                <input type="text" id="card_expiry" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>CVC *</label>
+                                <input type="text" id="card_cvc" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cardholder Name *</label>
+                            <input type="text" id="card_name" placeholder="Name on card">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="closeBookingModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const doctorId = <%= doctor.id %>;
+        let currentBookingDate = new Date();
+        let selectedBookingDate = null;
+
+        // Render booking calendar
+        function renderBookingCalendar() {
+            const year = currentBookingDate.getFullYear();
+            const month = currentBookingDate.getMonth();
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('booking-calendar-month').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendar = document.getElementById('booking-calendar');
+            
+            // Remove old day cells
+            const dayCells = calendar.querySelectorAll('.booking-day-cell');
+            dayCells.forEach(cell => cell.remove());
+            
+            // Add empty cells
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'booking-day-cell';
+                calendar.appendChild(emptyCell);
+            }
+            
+            // Add day cells
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'booking-day-cell';
+                dayCell.textContent = day;
+                
+                const cellDate = new Date(year, month, day);
+                const isPast = cellDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                
+                if (isPast) {
+                    dayCell.style.opacity = '0.3';
+                    dayCell.style.cursor = 'not-allowed';
+                } else {
+                    dayCell.style.cursor = 'pointer';
+                    dayCell.onclick = () => selectBookingDate(year, month, day);
+                }
+                
+                // Styling
+                dayCell.style.padding = '0.75rem';
+                dayCell.style.textAlign = 'center';
+                dayCell.style.borderRadius = '0.5rem';
+                dayCell.style.transition = 'all 0.2s';
+                
+                if (!isPast) {
+                    dayCell.addEventListener('mouseenter', () => {
+                        dayCell.style.background = 'var(--primary-light)';
+                    });
+                    dayCell.addEventListener('mouseleave', () => {
+                        if (!selectedBookingDate || selectedBookingDate.getTime() !== cellDate.getTime()) {
+                            dayCell.style.background = '';
+                        }
+                    });
+                }
+                
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        async function selectBookingDate(year, month, day) {
+            selectedBookingDate = new Date(year, month, day);
+            
+            // Update display
+            document.getElementById('selected-date-display').textContent = selectedBookingDate.toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            
+            // Show time slots container
+            document.getElementById('time-slots-container').style.display = 'block';
+            
+            // Update visual selection
+            renderBookingCalendar();
+            const dayCells = document.querySelectorAll('.booking-day-cell');
+            dayCells.forEach(cell => {
+                if (cell.textContent == day && !cell.style.opacity) {
+                    cell.style.background = 'var(--primary)';
+                    cell.style.color = 'white';
+                }
+            });
+            
+            // Fetch available time slots for this date
+            await loadTimeSlots(selectedBookingDate);
+        }
+
+        async function loadTimeSlots(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            const slotsGrid = document.getElementById('time-slots-grid');
+            slotsGrid.innerHTML = '<p style="text-align: center;">Loading slots...</p>';
+            
+            try {
+                const response = await fetch(`/patient/doctor/<%= doctor.id %>/slots?date=${dateStr}`);
+                const data = await response.json();
+                
+                if (data.slots && data.slots.length > 0) {
+                    slotsGrid.innerHTML = data.slots.map(slot => {
+                        if (slot.isBooked) {
+                            return `<button class="slot-btn booked" disabled>${slot.time}</button>`;
+                        } else {
+                            return `<button class="slot-btn" onclick="openBookingModal('${slot.isoTime}', '${slot.time}')">${slot.time}</button>`;
+                        }
+                    }).join('');
+                } else {
+                    slotsGrid.innerHTML = '<p style="text-align: center;">No slots available for this date.</p>';
+                }
+            } catch (err) {
+                console.error('Error loading slots:', err);
+                slotsGrid.innerHTML = '<p style="text-align: center; color: var(--danger);">Error loading slots. Please try again.</p>';
+            }
+        }
+
+        function changeBookingMonth(delta) {
+            currentBookingDate.setMonth(currentBookingDate.getMonth() + delta);
+            renderBookingCalendar();
+            // Hide time slots when changing month
+            document.getElementById('time-slots-container').style.display = 'none';
+        }
+
+        function openBookingModal(timeSlot, timeDisplay) {
+            var modal = document.getElementById('bookingModal');
+            var isLoggedIn = modal.dataset.isLoggedIn === 'true';
+            
+            if (!isLoggedIn) {
+                // Save return URL before redirect
+                sessionStorage.setItem('returnToBooking', window.location.pathname);
+                window.location.href = '/auth/login';
+                return;
+            }
+            
+            document.getElementById('modalTime').textContent = timeDisplay;
+            document.getElementById('modalTimeSlot').value = timeSlot;
+            modal.style.display = 'flex';
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        function togglePaymentFields() {
+            const onlineSelected = document.querySelector('input[name="payment_method"][value="online"]').checked;
+            const onlineFields = document.getElementById('online-payment-fields');
+            
+            if (onlineSelected) {
+                onlineFields.style.display = 'block';
+                
+                // Make online fields required
+                document.querySelectorAll('#online-payment-fields input').forEach(input => {
+                    input.setAttribute('required', 'required');
+                });
+            } else {
+                onlineFields.style.display = 'none';
+                
+                // Remove required from online fields
+                document.querySelectorAll('#online-payment-fields input').forEach(input => {
+                    input.removeAttribute('required');
+                });
+            }
+        }
+
+        // Initialize calendar on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBookingCalendar();
+        });
+    </script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,9 @@
+{
+    "name": "doctor-scanner",
+    "version": "1.0.0",
+    "description": "Scans images for the word 'طبيب'",
+    "main": "index.js",
+    "dependencies": {
+        "tesseract.js": "^5.0.0"
+    }
+}

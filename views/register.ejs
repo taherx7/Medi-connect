@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+
+    <div class="auth-container">
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">Create Account</h2>
+        
+        <div class="auth-tabs">
+            <a href="/auth/register?role=patient" class="auth-tab <%= role === 'patient' || !role ? 'active' : '' %>">Patient</a>
+            <a href="/auth/register?role=doctor" class="auth-tab <%= role === 'doctor' ? 'active' : '' %>">Doctor</a>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-msg"><%= error %></div>
+        <% } %>
+
+        <form action="/auth/register" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="role" value="<%= role || 'patient' %>">
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required placeholder="e.g. John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="e.g. john@example.com">
+            </div>
+
+            <% if (role === 'doctor') { %>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="e.g. +1 234 567 8900">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_photo">ID Photo (Medical License/Credentials)</label>
+                    <input type="file" id="id_photo" name="id_photo" accept="image/*" required>
+                    <small style="color: var(--text-light); display: block; margin-top: 0.5rem;">Upload a clear photo of your medical license or credentials for verification</small>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <%= role === 'doctor' ? 'Request Doctor Account' : 'Register as Patient' %>
+            </button>
+        </form>
+        
+        <p style="margin-top: 1.5rem; text-align: center; color: var(--text-light);">
+            Already have an account? <a href="/auth/login" style="color: var(--primary); text-decoration: none; font-weight: 600;">Log In</a>
+        </p>
+    </div>
+
+<%- include('partials/footer') %>

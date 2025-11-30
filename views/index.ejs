@@ -1,0 +1,155 @@
+<%- include('partials/header') %>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Find Your Perfect Doctor</h1>
+            <p>BOOK NOW !</p>
+            
+            <div style="position: relative; max-width: 800px; margin: 0 auto;">
+                <form action="/patient/search" method="GET" class="search-bar-split">
+                    <div class="search-input-group">
+                        <span class="search-icon"><i class="fas fa-search"></i></span>
+                        <input type="text" name="name" id="doctor-search-input" placeholder="Doctor Name, Specialty..." autocomplete="off">
+                    </div>
+                    <div class="search-divider"></div>
+                    <div class="search-input-group">
+                        <span class="search-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        <input type="text" name="location" placeholder="Location (City, Zip)...">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+                
+                <!-- Custom Search Results Dropdown -->
+                <div id="search-results-dropdown" class="search-dropdown" style="display: none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Results Section - Appears right after search bar -->
+    <% if (typeof doctors !== 'undefined' && doctors.length > 0) { %>
+        <section class="container" style="padding: 4rem 0;">
+            
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; color: var(--text); font-weight: 800; letter-spacing: -0.02em;">
+                <%= typeof searchPerformed !== 'undefined' && searchPerformed ? 'Search Results' : 'Available Doctors' %>
+            </h2>
+            <div class="doctor-grid">
+                <% doctors.forEach(doctor => { %>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="doctor-card-header">
+                                <div class="doctor-avatar">
+                                    <% if (doctor.photos_url) { %>
+                                        <img src="<%= doctor.photos_url %>" alt="<%= doctor.name %>">
+                                    <% } else { %>
+                                        <%= doctor.name.charAt(0) %>
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <h3 class="card-title"><%= doctor.name %></h3>
+                                    <p class="card-text" style="margin-bottom: 0.25rem;"><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 0.5rem;"></i><%= doctor.location || 'Location not specified' %></p>
+                                </div>
+                            </div>
+                            <p class="card-text" style="margin-top: 1rem;"><%= doctor.description ? doctor.description.substring(0, 100) + '...' : 'No description available.' %></p>
+                            <div style="margin-top: auto;">
+                                <a href="/patient/doctor/<%= doctor.id %>" class="btn btn-outline" style="width: 100%;">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% } else if (typeof searchPerformed !== 'undefined' && searchPerformed) { %>
+        <section class="container" style="padding: 6rem 0; text-align: center;">
+            <div style="font-size: 4rem; color: var(--text-light); margin-bottom: 1rem;"><i class="fas fa-search"></i></div>
+            <h2 style="color: var(--text); margin-bottom: 1rem;">No doctors found</h2>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Try adjusting your search criteria</p>
+            <a href="/" class="btn btn-secondary">Clear Search</a>
+        </section>
+    <% } %>
+
+    <!-- Stats and About sections only on homepage (not on search results) -->
+    <% if (typeof searchPerformed === 'undefined' || !searchPerformed) { %>
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">1,000+</div>
+                        <div class="stat-label">Qualified Doctors</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">10,000+</div>
+                        <div class="stat-label">Happy Patients</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50,000+</div>
+                        <div class="stat-label">Appointments Booked</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text" data-animate="animate-left">
+                        <h2>Did You Know?</h2>
+                        <p>Regular check-ups can identify potential health issues before they become a problem. When you see your doctor regularly, they are able to detect health conditions or diseases early.</p>
+                        <ul class="about-features">
+                            <li><i class="fas fa-check-circle"></i> <strong>Early Detection:</strong> Catching problems early gives you the best chance for getting the right treatment.</li>
+                            <li><i class="fas fa-heart"></i> <strong>Better Health:</strong> By getting the correct health services, screenings, and treatment you are taking steps toward living a longer, healthier life.</li>
+                            <li><i class="fas fa-coins"></i> <strong>Lower Costs:</strong> Healthcare costs are significantly lower when issues are caught early.</li>
+                        </ul>
+                    </div>
+                    <div class="about-image" data-animate="animate-right">
+                        <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Doctor explaining to patient">
+                    </div>
+                </div>
+                
+                <div class="about-content" style="margin-top: 8rem;">
+                    <div class="about-image" data-animate="animate-left">
+                        <img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Healthy lifestyle">
+                    </div>
+                    <div class="about-text" data-animate="animate-right">
+                        <h2>Our Mission</h2>
+                        <p>DocBook was founded with a simple mission: to make quality healthcare accessible to everyone. We believe that finding a great doctor should be easy and stress-free.</p>
+                        <p style="margin-top: 1rem;">We connect patients with top-rated doctors in their area, allowing for seamless booking and management of appointments. Whether you need a general check-up or a specialist consultation, DocBook is here to help.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How It Works</h2>
+                    <p>Get the care you need in 3 simple steps</p>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3>Find Specialist</h3>
+                        <p>Search for doctors by name, specialty, or location. View detailed profiles and reviews.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>View Schedule & Book</h3>
+                        <p>Choose a time slot that works for you and book your appointment instantly.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Get Care</h3>
+                        <p>Visit the doctor and get the treatment you need. Your health is our priority.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <% } %>
+
+<%- include('partials/footer') %>

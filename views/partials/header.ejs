@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>§§§§§§§ - Doctor Appointment Booking</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/search-dropdown.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">
+                <i class="fas fa-plus-circle"></i> MediConnect           </a>
+
+            <!-- Desktop Nav -->
+            <div class="nav-links">
+                <div class="nav-controls">
+                    <button id="themeToggle" class="icon-btn" title="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <span style="font-weight: 500;">Welcome, <%= user.name %></span>
+                    <% if (user.role === 'doctor') { %>
+                        <a href="/doctor/dashboard" class="btn btn-outline">Dashboard</a>
+                    <% } %>
+                    <a href="/auth/logout" class="btn btn-secondary">Logout</a>
+                <% } else { %>
+                    <a href="/auth/login" class="btn btn-outline">Log In</a>
+                    <a href="/auth/register?role=doctor" class="btn btn-primary">Register</a>
+                <% } %>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuBtn" class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <span class="logo"><i class="fas fa-plus-circle"></i> DocBook</span>
+            <button id="closeMenuBtn" class="icon-btn"><i class="fas fa-times"></i></button>
+        </div>
+
+        <% if (typeof user !== 'undefined' && user) { %>
+            <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+                <p style="margin-bottom: 0.5rem; color: var(--text-light);">Signed in as</p>
+                <p style="font-weight: 600;"><%= user.name %></p>
+            </div>
+            <% if (user.role === 'doctor') { %>
+                <a href="/doctor/dashboard" class="btn btn-outline" style="width: 100%;">Dashboard</a>
+            <% } %>
+            <a href="/auth/logout" class="btn btn-secondary" style="width: 100%;">Logout</a>
+        <% } else { %>
+            <a href="/auth/login" class="btn btn-outline" style="width: 100%;">Log In</a>
+            <a href="/auth/register?role=doctor" class="btn btn-primary" style="width: 100%;">Register</a>
+        <% } %>
+
+        <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 1rem; justify-content: center;">
+            <!-- Mobile Controls are handled by the main toggle, but we can duplicate or just rely on the desktop ones if visible, 
+                 but for mobile drawer usually we want them inside. For simplicity, let's keep them in the header for now or duplicate logic. 
+                 Actually, let's just keep the theme toggle in the main header visible on mobile too? 
+                 No, the design request says "Collapse buttons". Let's put them here. -->
+        </div>
+    </div>
+
+    <main>
