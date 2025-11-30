@@ -1,0 +1,21 @@
+{
+  "name": "MediConnect - Doctor Booking Platform",
+  "short_name": "MediConnect",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#38a169",
+  "description": "Book appointments with doctors easily and securely.",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

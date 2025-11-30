@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: mediconnect
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: doctor-photos
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mediconnect-db
+          property: connectionString
+
+databases:
+  - name: mediconnect-db
+    databaseName: mediconnect
+    user: mediconnect_user
+    plan: free

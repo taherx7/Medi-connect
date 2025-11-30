@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+    <div class="auth-container">
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">Login</h2>
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error-msg"><%= error %></div>
+        <% } %>
+        <form action="/auth/login" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="role">I am a:</label>
+                <select name="role" id="role">
+                    <option value="patient">Patient</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
+        </form>
+        <p style="margin-top: 1rem; text-align: center;">
+            Don't have an account? <a href="/auth/register">Register</a>
+        </p>
+    </div>
+
+<%- include('partials/footer') %>

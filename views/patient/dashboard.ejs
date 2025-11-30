@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<div class="container" style="padding: 4rem 0;">
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid #bbf7d0;">
+            ✅ <%= success %>
+        </div>
+    <% } %>
+
+    <h2 style="margin-bottom: 2rem;">My Appointments</h2>
+
+    <% if (reservations && reservations.length > 0) { %>
+        <div class="doctor-grid">
+            <% reservations.forEach(res => { %>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="doctor-card-header">
+                            <div class="doctor-avatar">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title"><%= res.doctor_name %></h3>
+                                <p class="card-text"><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 0.5rem;"></i><%= res.location %></p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <p style="margin-bottom: 0.5rem;"><strong>Date:</strong> <%= new Date(res.time_slot).toLocaleDateString() %></p>
+                            <p style="margin-bottom: 0.5rem;"><strong>Time:</strong> <%= new Date(res.time_slot).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></p>
+                            <p style="margin-bottom: 0.5rem;">
+                                <strong>Status:</strong> 
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.85rem; background: #dcfce7; color: #166534;">
+                                    <%= res.status %>
+                                </span>
+                            </p>
+                            <p>
+                                <strong>Payment:</strong> 
+                                <span style="text-transform: capitalize;"><%= res.payment_status %></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div style="text-align: center; padding: 4rem; background: var(--surface); border-radius: 1rem; border: 1px solid var(--border);">
+            <i class="fas fa-calendar-times" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+            <h3>No appointments yet</h3>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Book your first appointment with a top doctor today.</p>
+            <a href="/" class="btn btn-primary">Find a Doctor</a>
+        </div>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>
